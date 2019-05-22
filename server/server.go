@@ -185,11 +185,15 @@ func (server *Server) setupHandlers(ctx context.Context, cancel context.CancelFu
 		&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, Prefix: "static"},
 	)
 
+	nanaFileHandler := http.FileServer(http.Dir("/mnt"))
+
 	var siteMux = http.NewServeMux()
 	siteMux.HandleFunc(pathPrefix, server.handleIndex)
 	siteMux.Handle(pathPrefix+"js/", http.StripPrefix(pathPrefix, staticFileHandler))
 	siteMux.Handle(pathPrefix+"favicon.png", http.StripPrefix(pathPrefix, staticFileHandler))
 	siteMux.Handle(pathPrefix+"css/", http.StripPrefix(pathPrefix, staticFileHandler))
+
+	siteMux.Handle(pathPrefix+"nana/", http.StripPrefix(pathPrefix+"nana/", nanaFileHandler))
 
 	siteMux.HandleFunc(pathPrefix+"auth_token.js", server.handleAuthToken)
 	siteMux.HandleFunc(pathPrefix+"config.js", server.handleConfig)

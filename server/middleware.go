@@ -27,6 +27,12 @@ func (server *Server) wrapBasicAuth(handler http.Handler, credential string) htt
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
 
+		if strings.HasPrefix(r.URL.Path, "/nana/") {
+			log.Printf("%s", r.URL.Path)
+			handler.ServeHTTP(w, r)
+			return
+		}
+
 		if len(token) != 2 || strings.ToLower(token[0]) != "basic" {
 			w.Header().Set("WWW-Authenticate", `Basic realm="GoTTY"`)
 			http.Error(w, "Bad Request", http.StatusUnauthorized)
